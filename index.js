@@ -24,6 +24,9 @@ let videos = [
       option_3: 'Not Sure',
     },
     image: 'image_name_1',
+    state: 'false',
+    currentTime:0,
+
   },
   {
     video_id: 2,
@@ -40,6 +43,9 @@ let videos = [
       option_3: 'Not Sure 2',
     },
     image: null,
+    state: 'false',
+    currentTime:0,
+
   },
   {
     video_id: 3,
@@ -56,7 +62,9 @@ let videos = [
       option_3: 'Not Sure 3',
     },
     image: null,
-  },
+    state: 'false',
+    currentTime:0,
+    },
 ];
 
 let currentVideoIndex = 0;
@@ -70,15 +78,22 @@ app.get('/api/current-video', (req, res) => {
   res.json(currentVideo);
 });
 
-app.post('/api/response', (req, res) => {
-  const { Date_time, card_id, option_selected, image_name, question_id } = req.body;
-  // Save response to the database or perform any necessary actions
-  console.log('Received response:', { Date_time, card_id, option_selected, image_name, question_id });
-  res.json({ success: true });
-  
-  // Move to the next video for the next request
-  currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+
+app.put('/api/update-video-state', (req, res) => {
+  const { video_id, state, currentTime } = req.body;
+
+  const videoIndex = videos.findIndex(video => video.video_id === video_id);
+  if (videoIndex !== -1) {
+    videos[videoIndex].state = state;
+    if (state === 'false') {
+      videos[videoIndex].currentTime = currentTime;
+    }
+    res.json({ success: true });
+  } else {
+    res.json({ success: false, message: 'Video not found' });
+  }
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
