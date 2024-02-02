@@ -30,7 +30,7 @@ let videos = [
   },
   {
     video_id: 2,
-    video:"https://media.w3.org/2010/05/sintel/trailer_hd.mp4",
+    video:"https://vod-progressive.akamaized.net/exp=1706867390~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F4678%2F6%2F173394975%2F560155890.mp4~hmac=475a5f3ded9982ca11195c3704665266d2f27bb81fe0f4115311f2dfee83a4a4/vimeo-prod-skyfire-std-us/01/4678/6/173394975/560155890.mp4",
     Date_time: new Date(),
     show_id: 'id_of_show_2',
     video_type: 'Content',
@@ -50,7 +50,7 @@ let videos = [
   {
     video_id: 3,
     Date_time: new Date(),
-    video:"https://media.w3.org/2010/05/sintel/trailer_hd.mp4",
+    video:"https://vod-progressive.akamaized.net/exp=1706867300~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2150%2F8%2F210754025%2F722786080.mp4~hmac=6bbbcb411905cee67f397edd1abdad5c5a3fac7d6ef368cc9da99850eea97f90/vimeo-prod-skyfire-std-us/01/2150/8/210754025/722786080.mp4",
     show_id: 'id_of_show_3',
     video_type: 'Content',
     question_type: 'text',
@@ -78,7 +78,6 @@ app.get('/api/current-video', (req, res) => {
   res.json(currentVideo);
 });
 
-
 app.put('/api/update-video-state', (req, res) => {
   const { video_id, state, currentTime } = req.body;
 
@@ -94,6 +93,17 @@ app.put('/api/update-video-state', (req, res) => {
   }
 });
 
+app.get('/api/next-video', (req, res) => {
+  currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+  const nextVideo = videos[currentVideoIndex];
+  res.json(nextVideo);
+});
+
+app.get('/api/previous-video', (req, res) => {
+  currentVideoIndex = (currentVideoIndex - 1 + videos.length) % videos.length;
+  const previousVideo = videos[currentVideoIndex];
+  res.json(previousVideo);
+});
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
