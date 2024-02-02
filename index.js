@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const cors = require('cors'); // Import the cors middleware
-
+const cors = require('cors'); 
 const port = 8001;
 
 app.use(bodyParser.json());
@@ -30,7 +29,7 @@ let videos = [
   },
   {
     video_id: 2,
-    video:"https://vod-progressive.akamaized.net/exp=1706867390~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F4678%2F6%2F173394975%2F560155890.mp4~hmac=475a5f3ded9982ca11195c3704665266d2f27bb81fe0f4115311f2dfee83a4a4/vimeo-prod-skyfire-std-us/01/4678/6/173394975/560155890.mp4",
+    video:"https://vod-progressive.akamaized.net/exp=1706883066~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F3610%2F13%2F343052045%2F1373111310.mp4~hmac=1a01403c12e925544b7929f4cad7b9e3cca237188a8b3904970f6f7d9579cb50/vimeo-prod-skyfire-std-us/01/3610/13/343052045/1373111310.mp4",
     Date_time: new Date(),
     show_id: 'id_of_show_2',
     video_type: 'Content',
