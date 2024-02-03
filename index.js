@@ -1,11 +1,30 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const mongoose = require("mongoose");
+require("dotenv").config();
 const cors = require('cors'); 
-const port = 8001;
+const port = 8002;
 
+// MongoDB Connection
+mongoose.set("strictQuery", false);
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors());
+
+app.use(cors({ origin: "*" }));
 
 let videos = [
   {
@@ -44,7 +63,6 @@ let videos = [
     image: null,
     state: 'false',
     currentTime:0,
-
   },
   {
     video_id: 3,
@@ -104,6 +122,8 @@ app.get('/api/previous-video', (req, res) => {
   res.json(previousVideo);
 });
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
+  });
 });
