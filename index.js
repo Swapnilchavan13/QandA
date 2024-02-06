@@ -25,6 +25,7 @@ const connectDB = async () => {
   }
 };
 
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -52,13 +53,27 @@ app.get('/api/all-videos', async (req, res) => {
 
 app.get('/api/current-video', async (req, res) => {
   try {
-    const currentVideo = await Video.findOne({});
-    res.json(currentVideo);
+    const { video_id } = req.query;
+
+    let currentVideo;
+    
+    if (video_id) {
+      currentVideo = await Video.findById(video_id);
+    } else {
+      currentVideo = await Video.findOne({});
+    }
+
+    if (currentVideo) {
+      res.json(currentVideo);
+    } else {
+      res.status(404).json({ error: 'Video not found' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 app.post('/api/add-video', async (req, res) => {
   try {
