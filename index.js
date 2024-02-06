@@ -1,3 +1,5 @@
+// server.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -48,6 +50,15 @@ app.get('/api/all-videos', async (req, res) => {
   }
 });
 
+app.get('/api/current-video', async (req, res) => {
+  try {
+    const currentVideo = await Video.findOne({});
+    res.json(currentVideo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 app.post('/api/add-video', async (req, res) => {
   try {
@@ -82,8 +93,32 @@ app.put('/api/update-video-state', async (req, res) => {
   }
 });
 
+app.get('/api/next-video', async (req, res) => {
+  try {
+    const videos = await Video.find({});
+    currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+    const nextVideo = videos[currentVideoIndex];
+    res.json(nextVideo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/previous-video', async (req, res) => {
+  try {
+    const videos = await Video.find({});
+    currentVideoIndex = (currentVideoIndex - 1 + videos.length) % videos.length;
+    const previousVideo = videos[currentVideoIndex];
+    res.json(previousVideo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 connectDB().then(() => {
-  app.listen(port, '0.0.0.0', () => {
+  app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-  });;
+  });
 });
