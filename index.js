@@ -343,7 +343,7 @@ app.post('/api/saveSchedulerData', async (req, res) => {
         theater_id,
         start_date,
         scheduler_index,
-        ...selected_videos,
+        video_1, video_2, video_3, video_4, video_5, video_6, video_7, video_8, video_9, video_10, video_11, video_12, video_13, video_14, video_15,
         errors,
       ]);
     }
