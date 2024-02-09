@@ -150,10 +150,10 @@ const port = 8002;
 
 // MySQL Connection
 const db = mysql.createConnection({
-  host: "http://192.168.0.137/",
-  user: root,
-  password: "Abc#12345",
-  database: MEDIAPLAYER,
+  host: "localhost",
+  user: 'root',
+  password: "Swapnil@123",
+  database: 'Firstdb',
 });
 
 db.connect((err) => {
@@ -173,8 +173,8 @@ app.get('/', (req, res) => {
   res.json('Hello All');
 });
 
-app.get('/api/all-videos', (req, res) => {
-  db.query('SELECT * FROM videos', (err, results) => {
+app.get('/api/allVideos', (req, res) => {
+  db.query('SELECT * FROM Videodata', (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -187,7 +187,7 @@ app.get('/api/all-videos', (req, res) => {
 app.get('/api/current-video', (req, res) => {
   const { video_id } = req.query;
 
-  let query = 'SELECT * FROM videos';
+  let query = 'SELECT * FROM video_table';
   if (video_id) {
     query += ` WHERE video_id = ${db.escape(video_id)}`;
   }
@@ -224,7 +224,7 @@ app.post('/api/add-video', (req, res) => {
   } = req.body;
 
   const query = `
-    INSERT INTO videos (
+    INSERT INTO Videodata (
       video_id,
       video,
       Date_time,
@@ -304,6 +304,60 @@ app.get('/api/previous-video', (req, res) => {
     }
   });
 });
+
+app.post('/api/saveSchedulerData', async (req, res) => {
+  try {
+    const { theater_id, schedulers } = req.body;
+
+    // Check if schedulers is an array
+    if (!Array.isArray(schedulers)) {
+      return res.status(400).json({ error: 'Invalid schedulers format' });
+    }
+
+    // Create a MySQL connection pool directly in the route
+    const connection = mysql.createPool({
+      host: "localhost",
+      user: 'root',
+      password: "Swapnil@123",
+      database: 'Firstdb',
+      connectionLimit: 10, // Adjust as needed
+    });
+
+    // Iterate through schedulers and insert data into the database
+    for (const scheduler of schedulers) {
+      const {
+        start_date,
+        scheduler_index,
+        selected_videos,
+        errors,
+      } = scheduler;
+
+      // Build the SQL query
+      const query = `
+        INSERT INTO SchedulerData (theater_id, start_date, scheduler_index, video_1, video_2, video_3, video_4, video_5, video_6, video_7, video_8, video_9, video_10, video_11, video_12, video_13, video_14, video_15, errors)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      // Execute the query
+      await connection.query(query, [
+        theater_id,
+        start_date,
+        scheduler_index,
+        ...selected_videos,
+        errors,
+      ]);
+    }
+
+    // Release the connection pool
+    await connection.end();
+
+    res.status(200).json({ message: 'Data saved successfully' });
+  } catch (error) {
+    console.error('Error saving data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
