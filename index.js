@@ -146,17 +146,17 @@ require('dotenv').config();
 const cors = require('cors');
 
 const app = express();
-const port = 8002;
+const port = 8010;
 
 // MySQL Connection
-const db = mysql.createConnection({
+const Connection = mysql.createConnection({
   host: "localhost",
   user: 'root',
   password: "Swapnil@123",
   database: 'Firstdb',
 });
 
-db.connect((err) => {
+Connection.connect((err) => {
   if (err) {
     console.error('Error connecting to MySQL:', err);
     process.exit(1);
@@ -169,12 +169,12 @@ app.use(bodyParser.json());
 
 app.use(cors({ origin: '*' }));
 
+Connection.query('SELECT * FROM Videodata', (err, results) => {
 app.get('/', (req, res) => {
   res.json('Hello All');
 });
 
 app.get('/api/allVideos', (req, res) => {
-  db.query('SELECT * FROM Videodata', (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -189,10 +189,10 @@ app.get('/api/current-video', (req, res) => {
 
   let query = 'SELECT * FROM video_table';
   if (video_id) {
-    query += ` WHERE video_id = ${db.escape(video_id)}`;
+    query += ` WHERE video_id = ${Connection.escape(video_id)}`;
   }
 
-  db.query(query, (err, results) => {
+  Connection.query(query, (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -208,8 +208,11 @@ app.get('/api/current-video', (req, res) => {
 app.post('/api/saveSchedulerData', (req, res) => {
   const schedulerData = req.body;
 
+  // Convert video links array to JSON string
+  schedulerData.video_links = JSON.stringify(schedulerData.video_links);
+
   // Insert data into the MySQL table
-  db.query('INSERT INTO scheduler_data SET ?', schedulerData, (err, result) => {
+  Connection.query('INSERT INTO scheduler_data SET ?', schedulerData, (err, result) => {
     if (err) {
       console.error('Error saving data to MySQL:', err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -219,6 +222,7 @@ app.post('/api/saveSchedulerData', (req, res) => {
     }
   });
 });
+
 
 // Update the route to handle form data
 app.post('/api/add-video', (req, res) => {
@@ -256,22 +260,22 @@ app.post('/api/add-video', (req, res) => {
       state,
       currentTime
     ) VALUES (
-      ${db.escape(video_id)},
-      ${db.escape(video)},
-      ${db.escape(Date_time)},
-      ${db.escape(show_id)},
-      ${db.escape(video_type)},
-      ${db.escape(question_type)},
-      ${db.escape(question)},
-      ${db.escape(question_id)},
-      ${db.escape(options_option_1)},
-      ${db.escape(options_option_2)},
-      ${db.escape(options_option_3)},
-      ${db.escape(image)},
-      ${db.escape(state)},
-      ${db.escape(currentTime)}
+      ${Connection.escape(video_id)},
+      ${Connection.escape(video)},
+      ${Connection.escape(Date_time)},
+      ${Connection.escape(show_id)},
+      ${Connection.escape(video_type)},
+      ${Connection.escape(question_type)},
+      ${Connection.escape(question)},
+      ${Connection.escape(question_id)},
+      ${Connection.escape(options_option_1)},
+      ${Connection.escape(options_option_2)},
+      ${Connection.escape(options_option_3)},
+      ${Connection.escape(image)},
+      ${Connection.escape(state)},
+      ${Connection.escape(currentTime)}
     )`;
-  db.query(query, (err) => {
+  Connection.query(query, (err) => {
     
     if (err) {
       console.error(err);
@@ -285,9 +289,9 @@ app.post('/api/add-video', (req, res) => {
 app.put('/api/update-video-state', (req, res) => {
   const { video_id, state, currentTime } = req.body;
 
-  const query = `UPDATE videos SET state = ${db.escape(state)}, currentTime = ${state === 'false' ? db.escape(currentTime) : 0} WHERE video_id = ${db.escape(video_id)}`;
+  const query = `UPDATE videos SET state = ${Connection.escape(state)}, currentTime = ${state === 'false' ? Connection.escape(currentTime) : 0} WHERE video_id = ${Connection.escape(video_id)}`;
 
-  db.query(query, (err, results) => {
+  Connection.query(query, (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -300,7 +304,7 @@ app.put('/api/update-video-state', (req, res) => {
 });
 
 app.get('/api/next-video', (req, res) => {
-  db.query('SELECT * FROM videos', (err, results) => {
+  Connection.query('SELECT * FROM videos', (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -311,7 +315,7 @@ app.get('/api/next-video', (req, res) => {
 });
 
 app.get('/api/previous-video', (req, res) => {
-  db.query('SELECT * FROM videos', (err, results) => {
+  Connection.query('SELECT * FROM videos', (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -324,7 +328,7 @@ app.get('/api/previous-video', (req, res) => {
 
 // GET request to retrieve all scheduler data
 app.get('/api/allSchedulerData', (req, res) => {
-  db.query('SELECT * FROM scheduler_data', (err, results) => {
+  Connection.query('SELECT * FROM scheduler_data1', (err, results) => {
     if (err) {
       console.error('Error fetching scheduler data:', err);
       res.status(500).json({ error: 'Internal Server Error' });
