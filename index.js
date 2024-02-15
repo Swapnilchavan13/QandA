@@ -212,7 +212,7 @@ app.post('/api/saveSchedulerData', (req, res) => {
   schedulerData.video_links = JSON.stringify(schedulerData.video_links);
 
   // Insert data into the MySQL table
-  Connection.query('INSERT INTO scheduler_data SET ?', schedulerData, (err, result) => {
+  Connection.query('INSERT INTO scheduler_data1 SET ?', schedulerData, (err, result) => {
     if (err) {
       console.error('Error saving data to MySQL:', err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -227,13 +227,13 @@ app.post('/api/saveSchedulerData', (req, res) => {
 // Update the route to handle form data
 app.post('/api/add-video', (req, res) => {
   const {
-    video_id,
     video,
     Date_time,
     show_id,
     video_type,
     question_type,
     question,
+    video_id,
     question_id,
     options_option_1,
     options_option_2,
