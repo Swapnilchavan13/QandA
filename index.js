@@ -339,6 +339,28 @@ app.get('/api/allSchedulerData', (req, res) => {
   });
 });
 
+//PUT UPDATE DISPLAY TOGGLE DATA
+app.put('/api/changeDisplayToggle', async (req, res) => {
+  const { displayToggle, videoID } = req.body;
+  console.log("req.body",req.body)
+    const query = 'UPDATE videoData SET displayToggle = ? WHERE videoID =?';
+ 
+   const values = [displayToggle,videoID];
+
+    // Execute the update query
+    Connection.query(query, values, (error, result) => {
+      if (error) {
+            console.error('Error executing selectQueryTwo query:', error);
+            return res.status(500).json({ error: 'Error adding data plese try again' });
+      }else {
+        console.log(values)
+        console.log("update successful",result)
+      res.status(200).json({ message: 'Record found' });
+    }
+  }); 
+ 
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
